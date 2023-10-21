@@ -8,35 +8,46 @@ namespace NugetSearcher
 {
     public class NuGetManager
     {
-        public SourceRepository RemoteNuGetFeed { get; }
-        public Settings NuGetSettings { get; private set; }
+        public IEnumerable<SourceRepository> RemoteNuGetFeed { get; }
+        public ISettings NuGetSettings { get; }
 
         private readonly List<Lazy<INuGetResourceProvider>> _providers = new(Repository.Provider.GetCoreV3());
 
         public NuGetManager(string solutionPath)
         {
-            NuGetSettings = new Settings(solutionPath);
-            var source = NuGetSettings.GetSection("packageSources").Items
+            NuGetSettings = Settings.LoadDefaultSettings(solutionPath);
+            RemoteNuGetFeed = NuGetSettings.GetSection("packageSources").Items
                 .OfType<SourceItem>()
-                .FirstOrDefault();
-
-            PackageSource packageSource = new PackageSource(source.Value);
-            RemoteNuGetFeed = new SourceRepository(packageSource, _providers);
+                .Select(x => new PackageSource(x.Value))
+                .Select(x => new SourceRepository(x, _providers));
 
             PreviewFeatureSettings.DefaultCredentialsAfterCredentialProviders = true;
         }
 
         #region ListPackages/Install API
+
         /// <summary>
         /// Search Feed
         /// </summary>
         /// <param name="searchTerm"></param>
         /// <param name="includePrelease"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, List<NuGetVersion>>> ListPackagesAsync(string searchTerm, bool includePrelease)
+        public async Task<ILookup<string, NuGetVersion>> ListPackagesAsync(string searchTerm,
+            bool includePrelease)
+        {
+            var results = await RemoteNuGetFeed.ToAsyncEnumerable()
+                .SelectAwait(async x => await ListPackagesAsync(x, searchTerm, includePrelease))
+                .ToListAsync();
+
+            return results.SelectMany(x => x)
+                .SelectMany(x => x.Value.Select(y => (x.Key, y)))
+                .ToLookup(x => x.Key, x => x.y);
+        }
+
+        private async Task<Dictionary<string, List<NuGetVersion>>> ListPackagesAsync(SourceRepository sourceRepository, string searchTerm, bool includePrelease)
         {
             var retVal = new Dictionary<string, List<NuGetVersion>>();
-            var searchResource = await RemoteNuGetFeed.GetResourceAsync<PackageSearchResource>();
+            var searchResource = await sourceRepository.GetResourceAsync<PackageSearchResource>();
             if (searchResource != null)
             {
                 var searchFilter = new SearchFilter(true) { OrderBy = SearchOrderBy.Id, IncludeDelisted = false };
@@ -45,7 +56,7 @@ namespace NugetSearcher
             }
             else
             {
-                var listResource = await RemoteNuGetFeed.GetResourceAsync<ListResource>();
+                var listResource = await sourceRepository.GetResourceAsync<ListResource>();
                 IEnumerableAsync<IPackageSearchMetadata> allPackages = await listResource.ListAsync(searchTerm, includePrelease, true, false, NullLogger.Instance, CancellationToken.None);
                 var enumerator = allPackages.GetEnumeratorAsync();
                 var searchResults = new List<IPackageSearchMetadata>();

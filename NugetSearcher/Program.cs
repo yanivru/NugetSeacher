@@ -12,7 +12,7 @@
 
             foreach (var keyValuePair in listPackagesAsync)
             {
-                Console.WriteLine(keyValuePair.Key);
+                Console.WriteLine($"{keyValuePair.Key} - {keyValuePair.Max()}");
             }
         }
     }
