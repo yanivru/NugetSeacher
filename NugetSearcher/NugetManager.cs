@@ -13,12 +13,12 @@ namespace NugetSearcher
 
         private readonly List<Lazy<INuGetResourceProvider>> _providers = new(Repository.Provider.GetCoreV3());
 
-        public NuGetManager()
+        public NuGetManager(string solutionPath)
         {
-            NuGetSettings = new Settings(@"C:\Users\yrobinpur\source\repos\DataPlatform-Enricher");
+            NuGetSettings = new Settings(solutionPath);
             var source = NuGetSettings.GetSection("packageSources").Items
                 .OfType<SourceItem>()
-                .FirstOrDefault(x => x.Value.Contains("external", StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault();
 
             PackageSource packageSource = new PackageSource(source.Value);
             RemoteNuGetFeed = new SourceRepository(packageSource, _providers);
