@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33927.249
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NugetSearcher", "NugetSearcher\NugetSearcher.csproj", "{D1F24E40-BF4C-4F13-BD84-323ACA47391C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1F24E40-BF4C-4F13-BD84-323ACA47391C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1F24E40-BF4C-4F13-BD84-323ACA47391C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1F24E40-BF4C-4F13-BD84-323ACA47391C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1F24E40-BF4C-4F13-BD84-323ACA47391C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {58264525-89F6-43D8-A3A8-6CC68AB7B0C9}
+	EndGlobalSection
+EndGlobal

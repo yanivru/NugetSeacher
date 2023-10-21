@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NugetSearcher": {
+      "commandName": "Project",
+      "commandLineArgs": "newton"
+    }
+  }
+}
